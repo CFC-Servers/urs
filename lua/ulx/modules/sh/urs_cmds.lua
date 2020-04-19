@@ -1,4 +1,4 @@
-if !URS then URS = {} end
+URS = URS or {}
 
 URS.types = {}
 URS.types.restrictions = {"tool", "vehicle", "effect", "swep", "npc", "ragdoll", "prop", "sent", "all", "advdupe", "pickup"}
@@ -20,13 +20,12 @@ if SERVER then
     URS.Load()
 end
 
-
 function ulx.restrict( ply, type, what, ... )
     local groups = {...}
     local removers = {}
     what = string.lower( what )
 
-    if type == "all" and !table.HasValue( {"tool", "vehicle", "effect", "swep", "npc", "ragdoll", "prop", "sent"}, what ) then
+    if type == "all" and not table.HasValue( {"tool", "vehicle", "effect", "swep", "npc", "ragdoll", "prop", "sent"}, what ) then
         ULib.tsayError( ply, "Global Restrictions are limited to:\ntool, vehicle, effect, swep, npc, ragdoll, prop, sent" )
         return
     end
