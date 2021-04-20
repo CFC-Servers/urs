@@ -5,13 +5,11 @@ URS = URS or {}
 HOOK_LOW = HOOK_LOW or 1 -- ensure we don't break on old versions of ULib
 
 function URS.Load()
-    URS.restricions = {}
+    URS.restrictions = {}
     URS.limits = {}
-    URS.loadouts = {}
 
     if file.Exists( "ulx/restrictions.txt", "DATA" ) then URS.restrictions = util.JSONToTable( file.Read( "ulx/restrictions.txt", "DATA" ) ) end
     if file.Exists( "ulx/limits.txt", "DATA" ) then URS.limits = util.JSONToTable( file.Read( "ulx/limits.txt", "DATA" ) ) end
-    if file.Exists( "ulx/loadouts.txt", "DATA" ) then URS.loadouts = util.JSONToTable( file.Read( "ulx/loadouts.txt", "DATA" ) ) end
 
     -- Initiallize all tables to prevent errors
     for ursType, types in pairs(URS.types) do
@@ -28,19 +26,24 @@ function URS.Load()
 end
 
 URS_SAVE_ALL = 0
-URS_SAVE_RESTRICIONS = 1
+URS_SAVE_RESTRICTIONS = 1
 URS_SAVE_LIMITS = 2
-URS_SAVE_LOADOUTS = 3
 
 function URS.Save(n)
     if (n == URS_SAVE_ALL or n == URS_SAVE_RESTRICTIONS) 	and URS.restrictions then file.Write("ulx/restrictions.txt", util.TableToJSON(URS.restrictions)) end
     if (n == URS_SAVE_ALL or n == URS_SAVE_LIMITS) 			and URS.limits then file.Write("ulx/limits.txt", util.TableToJSON(URS.limits)) end
-    if (n == URS_SAVE_ALL or n == URS_SAVE_LOADOUTS) 		and URS.loadouts then file.Write("ulx/loadouts.txt", util.TableToJSON(URS.loadouts)) end
 end
 
-local echoSpawns = URS.cfg.echoSpawns:GetBool()
-local overwriteSbox = URS.cfg.overwriteSbox:GetBool()
-local weaponPickups = URS.cfg.weaponPickups:GetInt()
+local echoSpawns
+local overwriteSbox
+local weaponPickups
+
+hook.Add( "Initialize", "URSConfLoad", function()
+    echoSpawns = URS.cfg.echoSpawns:GetBool()
+    overwriteSbox = URS.cfg.overwriteSbox:GetBool()
+    weaponPickups = URS.cfg.weaponPickups:GetInt()
+end )
+
 local logSpawn = ulx.logSpawn
 
 local stringLower = string.lower
@@ -98,7 +101,7 @@ function URS.Check(ply, restrictionType, what)
     local ursLimits = rawget( URS, "limits" )
     local typeLimits = rawget( ursLimits, restrictionType )
     local playerTypeLimit = typeLimits and rawget( typeLimits, ply:SteamID() )
-    local groupTypeLimit = typeLimits and rawget( tyleLimits, group )
+    local groupTypeLimit = typeLimits and rawget( typeLimits, group )
 
     if hasGroup then
         ULib.tsayError(ply, "Your rank is restricted from all ".. restrictionTypePlural)
@@ -207,20 +210,3 @@ function URS.CheckRestrictedVehicle(ply, mdl, name, vehicle_table)
     return Check( ply, "vehicle", mdl ) and Check( ply, "vehicle", name )
 end
 hook.Add( "PlayerSpawnVehicle", "URSCheckRestrictedVehicle", URS.CheckRestrictedVehicle, HOOK_LOW )
-
-function URS.CustomLoadouts(ply)
-    if URS.loadouts[ply:SteamID()] then
-        ply:StripWeapons()
-        for k, v in pairs( URS.loadouts[ply:SteamID()] ) do
-            ply:Give( v )
-        end
-        return true
-    elseif URS.loadouts[ply:GetUserGroup()] then
-        ply:StripWeapons()
-        for k, v in pairs( URS.loadouts[ply:GetUserGroup()] ) do
-            ply:Give( v )
-        end
-        return true
-    end
-end
-hook.Add( "PlayerLoadout", "URSCustomLoadouts", URS.CustomLoadouts, HOOK_LOW )
