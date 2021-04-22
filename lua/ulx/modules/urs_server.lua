@@ -45,9 +45,7 @@ hook.Add( "Initialize", "URSConfLoad", function()
 end )
 
 local logSpawn = ulx.logSpawn
-
 local stringLower = string.lower
-
 local rawget = rawget
 
 function URS.PrintRestricted(ply, restrictionType, what)
@@ -94,8 +92,13 @@ function URS.Check(ply, restrictionType, what)
     local allTypeRestrictions = allRestrictions and rawget( allRestrictions, restrictionType )
     local hasGroup = allTypeRestrictions and rawget( allTypeRestrictions, group )
 
+    if hasGroup then
+        ULib.tsayError(ply, "Your rank is restricted from all ".. restrictionTypePlural)
+        return false
+    end
+
     local ursTypes = rawget( URS, "types" )
-    local ursTypeLimits = rawget( ursTypes, "limits" )
+    local ursTypeLimits = rawget( ursTypes, "limitsMap" )
     local limitsHasType = rawget( ursTypeLimits, restrictionType )
 
     local ursLimits = rawget( URS, "limits" )
@@ -103,11 +106,8 @@ function URS.Check(ply, restrictionType, what)
     local playerTypeLimit = typeLimits and rawget( typeLimits, ply:SteamID() )
     local groupTypeLimit = typeLimits and rawget( typeLimits, group )
 
-    if hasGroup then
-        ULib.tsayError(ply, "Your rank is restricted from all ".. restrictionTypePlural)
-        return false
-
-    elseif limitsHasType and typeLimits and ( playerTypeLimit or groupTypeLimit ) then
+    if limitsHasType and typeLimits and ( playerTypeLimit or groupTypeLimit ) then
+        -- TODO: Should this be an elseif? Shouldn't both cases be possible?
         if playerTypeLimit then
             if ply:GetCount(restrictionTypePlural) >= playerTypeLimit then
                 ply:LimitHit( restrictionTypePlural )
@@ -141,13 +141,13 @@ timer.Simple(0.1, function()
 
     -- Advanced Duplicator 2 (http://facepunch.com/showthread.php?t=1136597)
     if AdvDupe2 then
-        hook.Add("PlayerSpawnEntity", "URSCheckRestrictedEntity", function(ply, EntTable)
-            if Check(ply, "advdupe", EntTable.Class) == false or Check(ply, "advdupe", EntTable.Model) == false then
+        hook.Add("PlayerSpawnSENT", "URSCheckRestrictedEntity", function(ply, entClass)
+            if ply:IsAdmin() then return end
+            if Check(ply, "advdupe", entClass) == false then
                 return false
             end
         end)
     end
-
 end )
 
 function URS.CheckRestrictedSENT(ply, sent)
@@ -163,7 +163,7 @@ hook.Add( "PlayerSpawnProp", "URSCheckRestrictedProp", URS.CheckRestrictedProp, 
 function URS.CheckRestrictedTool(ply, tr, tool)
     if Check( ply, "tool", tool ) == false then return false end
     if echoSpawns and tool ~= "inflator" then
-        logSpawn( ply:Nick().."<".. ply:SteamID() .."> used the tool ".. tool .." on ".. tr.Entity:GetModel() )
+        logSpawn( ply:Nick().."<".. ply:SteamID() .."> used the tool ".. tool .." on ".. rawget( tr, "Entity" ):GetModel() )
     end
 end
 hook.Add( "CanTool", "URSCheckRestrictedTool", URS.CheckRestrictedTool, HOOK_LOW )

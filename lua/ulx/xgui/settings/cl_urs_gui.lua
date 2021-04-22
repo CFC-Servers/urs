@@ -93,8 +93,8 @@ urs.typelist.OnRowSelected = function( panel, lineid, line )
     elseif urs.restrictionlist:GetSelected()[1]:GetValue(1) == "Limits" then
         for type, types in pairs( xgui.data.URSLimits ) do
             if type == line:GetValue(1) then
-                for group in pairs( types ) do
-                    urs.itemlist:AddLine( group, group )
+                for group, numericLimit in pairs( types ) do
+                    urs.itemlist:AddLine( group, numericLimit )
                 end
             end
         end

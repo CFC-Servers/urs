@@ -3,6 +3,14 @@ URS = URS or {}
 URS.types = {}
 URS.types.restrictions = {"tool","vehicle","effect","swep", "npc","ragdoll","prop","sent", "all", "advdupe", "pickup"}
 URS.types.limits = {"vehicle","effect", "npc","ragdoll","prop","sent"}
+URS.types.limitsMap = {
+    vehicle = true,
+    effect = true,
+    npc = true,
+    ragdoll = true,
+    prop = true,
+    sent = true
+}
 
 URS.restrictions = {}
 URS.limits = {}
