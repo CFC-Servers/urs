@@ -141,13 +141,13 @@ timer.Simple(0.1, function()
 
     -- Advanced Duplicator 2 (http://facepunch.com/showthread.php?t=1136597)
     if AdvDupe2 then
-        hook.Add("PlayerSpawnSENT", "URSCheckRestrictedEntity", function(ply, entClass)
-            if ply:IsAdmin() then return end
-            if Check(ply, "advdupe", entClass) == false then
+        hook.Add("PlayerSpawnEntity", "URSCheckRestrictedEntity", function(ply, EntTable)
+            if Check(ply, "advdupe", EntTable.Class) == false or Check(ply, "advdupe", EntTable.Model) == false then
                 return false
             end
         end)
     end
+
 end )
 
 function URS.CheckRestrictedSENT(ply, sent)
