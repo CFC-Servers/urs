@@ -32,6 +32,10 @@ URS_SAVE_LIMITS = 2
 function URS.Save(n)
     if (n == URS_SAVE_ALL or n == URS_SAVE_RESTRICTIONS) 	and URS.restrictions then file.Write("ulx/restrictions.txt", util.TableToJSON(URS.restrictions)) end
     if (n == URS_SAVE_ALL or n == URS_SAVE_LIMITS) 			and URS.limits then file.Write("ulx/limits.txt", util.TableToJSON(URS.limits)) end
+
+    for _, ply in ipairs( player.GetAll() ) do
+        p,y.URS_CacheCheck = nil
+    end
 end
 
 local echoSpawns
@@ -44,9 +48,11 @@ hook.Add( "Initialize", "URSConfLoad", function()
     weaponPickups = URS.cfg.weaponPickups:GetInt()
 end )
 
+local IsValid = IsValid
 local logSpawn = ulx.logSpawn
 local stringLower = string.lower
 local rawget = rawget
+local rawset = rawset
 
 function URS.PrintRestricted(ply, restrictionType, what)
     if restrictionType == "pickup" then return end -- Constant spam
@@ -58,7 +64,41 @@ function URS.PrintRestricted(ply, restrictionType, what)
 end
 local PrintRestricted = URS.PrintRestricted
 
+-- Return cached value for this check
+function URS.CachedCheck(ply, restrictionType, what)
+    ply.URS_CacheCheck = ply.URS_CacheCheck or {}
+
+    local existing = ply.URS_CacheCheck
+    local restrictionTypes = rawget( existing, restrictionType ) 
+
+    if not restrictionTypes then return end
+
+    -- true, false, or nil
+    return rawget( restrictionTypes, what )
+end
+local cachedCheck = URS.CachedCheckValue
+
+-- Caches the given check and returns the given result
+function URS.CacheCheck(ply, restrictionType, what, result)
+    ply.URS_CacheCheck = ply.URS_CacheCheck or {}
+
+    local existing = ply.URS_CacheCheck
+    local restrictionTypes = rawget( existing, restrictionType ) 
+
+    if not restrictionTypes then
+        rawset( existing, restrictionType, {} )
+    end
+
+    rawset( restrictionTypes, what, result )
+
+    return result
+end
+local cacheCheck = URS.CacheCheck
+
 function URS.Check(ply, restrictionType, what)
+    local cachedResult = cachedCheck( ply, restrictionType, what )
+    if cachedResult ~= nil then return cachedResult end
+
     what = stringLower(what)
     local restrictionTypePlural = restrictionType .. "s"
     local group = ply:GetUserGroup()
@@ -80,11 +120,11 @@ function URS.Check(ply, restrictionType, what)
         if rawget( restriction, "*" ) then
             if not ( hasGroup or hasPlayer ) then
                 PrintRestricted( ply, restrictionType, what )
-                return false
+                return cacheCheck( ply, restrictionType, what, false )
             end
         elseif hasGroup or hasPlayer then
             PrintRestricted( ply, restrictionType, what )
-            return false
+            return cacheCheck( ply, restrictionType, what, false )
         end
     end
 
@@ -94,34 +134,36 @@ function URS.Check(ply, restrictionType, what)
 
     if hasGroup then
         ULib.tsayError(ply, "Your rank is restricted from all ".. restrictionTypePlural)
-        return false
+        return cacheCheck( ply, restrictionType, what, false )
     end
 
     local ursTypes = rawget( URS, "types" )
     local ursTypeLimits = rawget( ursTypes, "limitsMap" )
     local limitsHasType = rawget( ursTypeLimits, restrictionType )
+    if not limitHasType then return end
 
     local ursLimits = rawget( URS, "limits" )
     local typeLimits = rawget( ursLimits, restrictionType )
+    if not typeLimits then return end
+
     local playerTypeLimit = typeLimits and rawget( typeLimits, ply:SteamID() )
     local groupTypeLimit = typeLimits and rawget( typeLimits, group )
+    if not playerTypeLimit or groupTypeLimit then return end
 
-    if limitsHasType and typeLimits and ( playerTypeLimit or groupTypeLimit ) then
-        -- TODO: Should this be an elseif? Shouldn't both cases be possible?
-        if playerTypeLimit then
-            if ply:GetCount(restrictionTypePlural) >= playerTypeLimit then
-                ply:LimitHit( restrictionTypePlural )
-                return false
-            end
-        elseif groupTypeLimit then
-            if ply:GetCount(restrictionTypePlural) >= groupTypeLimit then
-                ply:LimitHit( restrictionTypePlural )
-                return false
-            end
+    -- TODO: Should this be an elseif? Shouldn't both cases be possible?
+    if playerTypeLimit then
+        if ply:GetCount(restrictionTypePlural) >= playerTypeLimit then
+            ply:LimitHit( restrictionTypePlural )
+            return false
         end
-        if overwriteSbox then
-            return true -- Overwrite sbox limit (ours is greater)
+    elseif groupTypeLimit then
+        if ply:GetCount(restrictionTypePlural) >= groupTypeLimit then
+            ply:LimitHit( restrictionTypePlural )
+            return false
         end
+    end
+    if overwriteSbox then
+        return true -- Overwrite sbox limit (ours is greater)
     end
 end
 local Check = URS.Check
@@ -160,11 +202,21 @@ function URS.CheckRestrictedProp(ply, mdl)
 end
 hook.Add( "PlayerSpawnProp", "URSCheckRestrictedProp", URS.CheckRestrictedProp, HOOK_LOW )
 
+local ignoredTools = {
+    inflator = true,
+    paint = true
+}
+
 function URS.CheckRestrictedTool(ply, tr, tool)
     if Check( ply, "tool", tool ) == false then return false end
-    if echoSpawns and tool ~= "inflator" then
-        logSpawn( ply:Nick().."<".. ply:SteamID() .."> used the tool ".. tool .." on ".. rawget( tr, "Entity" ):GetModel() )
-    end
+
+    if not echoSpawns then return end
+    if ignoredTools[tool] then return end
+
+    local ent = rawget( tr, "Entity" )
+    if not IsValid( ent ) then return end
+
+    logSpawn( ply:Nick().."<".. ply:SteamID() .."> used the tool ".. tool .." on ".. ent:GetModel() )
 end
 hook.Add( "CanTool", "URSCheckRestrictedTool", URS.CheckRestrictedTool, HOOK_LOW )
 
@@ -186,20 +238,24 @@ hook.Add( "PlayerSpawnRagdoll", "URSCheckRestrictedRagdoll", URS.CheckRestricted
 function URS.CheckRestrictedSWEP(ply, class, weapon)
     if Check( ply, "swep", class ) == false then
         return false
-    elseif echoSpawns then
-        logSpawn( ply:Nick().."<".. ply:SteamID() .."> spawned/gave himself swep ".. class )
     end
+
+    if not echoSpawns then return end
+
+    logSpawn( ply:Nick().."<".. ply:SteamID() .."> spawned/gave himself swep ".. class )
 end
 hook.Add( "PlayerSpawnSWEP", "URSCheckRestrictedSWEP", URS.CheckRestrictedSWEP, HOOK_LOW )
 hook.Add( "PlayerGiveSWEP", "URSCheckRestrictedSWEP2", URS.CheckRestrictedSWEP, HOOK_LOW )
 
 function URS.CheckRestrictedPickUp(ply, weapon)
     if weaponPickups == 2 then
-        if Check( ply, "pickup", weapon:GetClass(), true) == false then
+        if Check( ply, "pickup", weapon:GetClass(), true ) == false then
             return false
         end
-    elseif weaponPickups == 1 then
-        if Check( ply, "swep", weapon:GetClass()) == false then
+    end
+
+    if weaponPickups == 1 then
+        if Check( ply, "swep", weapon:GetClass() ) == false then
             return false
         end
     end
