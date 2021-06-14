@@ -34,7 +34,7 @@ function URS.Save(n)
     if (n == URS_SAVE_ALL or n == URS_SAVE_LIMITS) 			and URS.limits then file.Write("ulx/limits.txt", util.TableToJSON(URS.limits)) end
 
     for _, ply in ipairs( player.GetAll() ) do
-        p,y.URS_CacheCheck = nil
+        ply.URS_CacheCheck = nil
     end
 end
 
@@ -76,7 +76,7 @@ function URS.CachedCheck(ply, restrictionType, what)
     -- true, false, or nil
     return rawget( restrictionTypes, what )
 end
-local cachedCheck = URS.CachedCheckValue
+local cachedCheck = URS.CachedCheck
 
 -- Caches the given check and returns the given result
 function URS.CacheCheck(ply, restrictionType, what, result)
