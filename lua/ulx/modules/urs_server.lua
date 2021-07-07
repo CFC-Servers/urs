@@ -125,6 +125,7 @@ hook.Add( "PlayerSpawnProp", "URSCheckRestrictedProp", URS.CheckRestrictedProp, 
 
 function URS.CheckRestrictedTool(ply, tr, tool)
 	if URS.Check( ply, "tool", tool ) == false then return false end
+    if not IsValid( ply ) then return end
 	if URS.cfg.echoSpawns:GetBool() and tool != "inflator" then
 		ulx.logSpawn( ply:Nick().."<".. ply:SteamID() .."> used the tool ".. tool .." on ".. tr.Entity:GetModel() )
 	end
