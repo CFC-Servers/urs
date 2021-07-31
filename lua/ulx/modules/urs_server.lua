@@ -145,7 +145,7 @@ function URS.Check(ply, restrictionType, what)
     local ursTypes = rawget( URS, "types" )
     local ursTypeLimits = rawget( ursTypes, "limitsMap" )
     local limitsHasType = rawget( ursTypeLimits, restrictionType )
-    if not limitHasType then return end
+    if not limitsHasType then return end
 
     local ursLimits = rawget( URS, "limits" )
     local typeLimits = rawget( ursLimits, restrictionType )
