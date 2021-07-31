@@ -66,7 +66,7 @@ function ulx.restrict( ply, type, what, ... )
         for groupName in pairs( groups ) do
             if table.HasValue(URS.restrictions[type][what], groupName) then
                 tableInsert(removers, groupName)
-                ULib.tsayError(ply, groupName .." is already restricted from this rank.")
+                ULib.tsayError(ply, groupName .. " is already restricted from this rank." )
             else
                 URS.restrictions[type][what][groupName] = true
             end
@@ -87,9 +87,9 @@ function ulx.restrict( ply, type, what, ... )
     end
 end
 local restrict = ulx.command( "URS", "ulx restrict", ulx.restrict, "!restrict" )
-restrict:addParam{ type=ULib.cmds.StringArg, hint="Type", completes=URS.types.restrictions, ULib.cmds.restrictToCompletes }
-restrict:addParam{ type=ULib.cmds.StringArg, hint="Target Name/Model Path" }
-restrict:addParam{ type=ULib.cmds.StringArg, hint="Groups", ULib.cmds.takeRestOfLine, repeat_min=1 }
+restrict:addParam{ type = ULib.cmds.StringArg, hint = "Type", completes = URS.types.restrictions, ULib.cmds.restrictToCompletes }
+restrict:addParam{ type = ULib.cmds.StringArg, hint = "Target Name/Model Path" }
+restrict:addParam{ type = ULib.cmds.StringArg, hint = "Groups", ULib.cmds.takeRestOfLine, repeat_min = 1 }
 restrict:defaultAccess( ULib.ACCESS_SUPERADMIN )
 restrict:help( "Add a restriction to a group." )
 
@@ -104,7 +104,7 @@ function ulx.unrestrict( ply, type, what, ... )
     what = stringLower( what )
 
     if not URS.restrictions[type][what] then
-        ULib.tsayError( ply, what .." is not a restricted ".. type )
+        ULib.tsayError( ply, what .. " is not a restricted " .. type )
         return
     end
 
@@ -129,7 +129,7 @@ function ulx.unrestrict( ply, type, what, ... )
                 URS.restrictions[type][what][v] = nil
                 table.insert( handled, v )
             else
-                ULib.tsayError( ply, v .." is not restricted from ".. what )
+                ULib.tsayError( ply, v .. " is not restricted from " .. what )
             end
         end
     end
@@ -146,9 +146,9 @@ function ulx.unrestrict( ply, type, what, ... )
     end
 end
 local unrestrict = ulx.command( "URS", "ulx unrestrict", ulx.unrestrict, "!unrestrict")
-unrestrict:addParam{ type=ULib.cmds.StringArg, hint="Type", completes=URS.types.restrictions, ULib.cmds.restrictToCompletes }
-unrestrict:addParam{ type=ULib.cmds.StringArg, hint="Target Name/Model Path" }
-unrestrict:addParam{ type=ULib.cmds.StringArg, hint="Groups", ULib.cmds.takeRestOfLine, repeat_min=1 }
+unrestrict:addParam{ type = ULib.cmds.StringArg, hint = "Type", completes = URS.types.restrictions, ULib.cmds.restrictToCompletes }
+unrestrict:addParam{ type = ULib.cmds.StringArg, hint = "Target Name/Model Path" }
+unrestrict:addParam{ type = ULib.cmds.StringArg, hint = "Groups", ULib.cmds.takeRestOfLine, repeat_min = 1 }
 unrestrict:defaultAccess( ULib.ACCESS_SUPERADMIN )
 unrestrict:help( "Remove a restrictions from a group." )
 
@@ -159,8 +159,8 @@ function ulx.setlimit( ply, type, group, limit )
     ulx.fancyLogAdmin( ply, URS.cfg.echoCommands:GetBool(), "#A set the #s limit for #s to #i", type, group, limit )
 end
 local limit = ulx.command( "URS", "ulx setlimit", ulx.setlimit, "!setlimit" )
-limit:addParam{ type=ULib.cmds.StringArg, ULib.cmds.restrictToCompletes, completes=URS.types.limits, hint="Type" }
-limit:addParam{ type=ULib.cmds.StringArg, hint="Group" }
-limit:addParam{ type=ULib.cmds.NumArg, min=-1, default=-1, hint="Amount (-1 is default)" }
+limit:addParam{ type = ULib.cmds.StringArg, ULib.cmds.restrictToCompletes, completes = URS.types.limits, hint = "Type" }
+limit:addParam{ type = ULib.cmds.StringArg, hint = "Group" }
+limit:addParam{ type = ULib.cmds.NumArg, min = -1, default = -1, hint = "Amount (-1 is default)" }
 limit:defaultAccess( ULib.ACCESS_SUPERADMIN )
 limit:help( "Set limits for specific groups." )
