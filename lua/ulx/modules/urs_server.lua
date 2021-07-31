@@ -50,6 +50,7 @@ end )
 
 local IsValid = IsValid
 local logSpawn = ulx.logSpawn
+local tsayError = ULib.tsayError
 local stringLower = string.lower
 local rawget = rawget
 local rawset = rawset
@@ -60,7 +61,7 @@ function URS.PrintRestricted(ply, restrictionType, what)
     if echoSpawns then
         logSpawn(ply:Nick() .."<".. ply:SteamID() .."> spawned/used ".. restrictionType .." ".. what .." -=RESTRICTED=-")
     end
-    ULib.tsayError(ply, "\"".. what .."\" is a restricted ".. restrictionType .." from your rank.")
+    tsayError(ply, "\"".. what .."\" is a restricted ".. restrictionType .." from your rank.")
 end
 local PrintRestricted = URS.PrintRestricted
 
@@ -137,7 +138,7 @@ function URS.Check(ply, restrictionType, what)
     local hasGroup = allTypeRestrictions and rawget( allTypeRestrictions, group )
 
     if hasGroup then
-        ULib.tsayError(ply, "Your rank is restricted from all ".. restrictionTypePlural)
+        tsayError(ply, "Your rank is restricted from all ".. restrictionTypePlural)
         return cacheCheck( ply, restrictionType, what, false )
     end
 
