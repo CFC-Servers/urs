@@ -69,7 +69,7 @@ function URS.CachedCheck(ply, restrictionType, what)
     ply.URS_CacheCheck = ply.URS_CacheCheck or {}
 
     local existing = ply.URS_CacheCheck
-    local restrictionTypes = rawget( existing, restrictionType ) 
+    local restrictionTypes = rawget( existing, restrictionType )
 
     if not restrictionTypes then return end
 
