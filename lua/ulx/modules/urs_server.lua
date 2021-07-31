@@ -153,7 +153,7 @@ function URS.Check(ply, restrictionType, what)
 
     local playerTypeLimit = rawget( typeLimits, ply:SteamID() )
     local groupTypeLimit = rawget( typeLimits, group )
-    if not playerTypeLimit or groupTypeLimit then return end
+    if not playerTypeLimit and not groupTypeLimit then return end
 
     -- TODO: Should this be an elseif? Shouldn't both cases be possible?
     if playerTypeLimit then
