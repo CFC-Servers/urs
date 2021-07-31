@@ -263,7 +263,7 @@ function URS.CheckRestrictedPickUp( ply, weapon )
 end
 hook.Add( "PlayerCanPickupWeapon", "URSCheckRestrictedPickUp", URS.CheckRestrictedPickUp, HOOK_LOW )
 
-function URS.CheckRestrictedVehicle(ply, mdl, name )
+function URS.CheckRestrictedVehicle( ply, mdl, name )
     return Check( ply, "vehicle", mdl ) and Check( ply, "vehicle", name )
 end
 hook.Add( "PlayerSpawnVehicle", "URSCheckRestrictedVehicle", URS.CheckRestrictedVehicle, HOOK_LOW )
