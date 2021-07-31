@@ -6,15 +6,15 @@ urs.removers = {}
 urs.weapons = weapons.GetList()
 urs.arg1save = nil
 
-urs.back = xlib.makepanel{ parent=xgui.null }
-urs.restrictionlist = xlib.makelistview{ parent=urs.back, x=5, y=5, w=150, h=71 }
-urs.typelist = xlib.makelistview{ parent=urs.back, x=5, y=81, w=150, h=220 }
-urs.itemlist = xlib.makelistview{ parent=urs.back, x=160, y=5, w=425, h=295, multiselect=true }
-urs.addbutton = xlib.makebutton{ parent=urs.back, x=485, y=306, w=100, h=25, label="Add", disabled=true }
-urs.removebutton = xlib.makebutton{ parent=urs.back, x=5, y=306, w=150, h=25, label="Remove Selected Items", disabled=true }
-urs.arg1 = xlib.makecombobox{ parent=urs.back, x=160, y=306, w=155, h=25, disabled=true}
-urs.arg2 = xlib.makecombobox{ parent=urs.back, x=320, y=306, w=160, h=25, disabled=true}
-urs.arg3 = xlib.maketextbox{ parent=urs.back, x=320, y=306, w=160, h=25, disabled=true, visible=false}
+urs.back = xlib.makepanel{ parent = xgui.null }
+urs.restrictionlist = xlib.makelistview{ parent = urs.back, x = 5, y = 5, w = 150, h = 71 }
+urs.typelist = xlib.makelistview{ parent = urs.back, x = 5, y = 81, w = 150, h = 220 }
+urs.itemlist = xlib.makelistview{ parent = urs.back, x = 160, y = 5, w = 425, h = 295, multiselect = true }
+urs.addbutton = xlib.makebutton{ parent = urs.back, x = 485, y = 306, w = 100, h = 25, label = "Add", disabled = true }
+urs.removebutton = xlib.makebutton{ parent = urs.back, x = 5, y = 306, w = 150, h = 25, label = "Remove Selected Items", disabled = true }
+urs.arg1 = xlib.makecombobox{ parent = urs.back, x = 160, y = 306, w = 155, h = 25, disabled = true}
+urs.arg2 = xlib.makecombobox{ parent = urs.back, x = 320, y = 306, w = 160, h = 25, disabled = true}
+urs.arg3 = xlib.maketextbox{ parent = urs.back, x = 320, y = 306, w = 160, h = 25, disabled = true, visible = false}
 urs.arg2Old = urs.arg2
 
 urs.restrictionlist:AddColumn( "Type of Restriction" )
@@ -26,7 +26,7 @@ urs.itemlist:AddColumn( " " )
 
 --------------------------------------------------------------------------------------------------------------------------------------------
 
-urs.restrictionlist.OnRowSelected = function( self, lineid, line )
+urs.restrictionlist.OnRowSelected = function( _, _, line )
     urs.arg1:Clear()
     urs.arg2:Clear()
     urs.arg1save = nil
@@ -42,13 +42,13 @@ urs.restrictionlist.OnRowSelected = function( self, lineid, line )
         urs.arg1:SetText( "Group(s)" )
         urs.arg2:SetText( "Target" )
         --urs.arg2:AddChoice( "*" )
-        for group, groups in pairs( xgui.data.groups ) do
+        for _, groups in pairs( xgui.data.groups ) do
             urs.arg1:AddChoice( groups )
         end
     elseif line:GetValue(1) == "Limits" then
         urs.arg1:SetText( "Group" )
         urs.arg2:SetText( "Limit" )
-        for group, groups in pairs( xgui.data.groups ) do
+        for _, groups in pairs( xgui.data.groups ) do
             urs.arg1:AddChoice( groups )
         end
     end
@@ -59,20 +59,20 @@ urs.restrictionlist.OnRowSelected = function( self, lineid, line )
         urs.typelist.Columns[1]:SetName( "Type" )
         urs.itemlist.Columns[1]:SetName( "Target" )
         urs.itemlist.Columns[2]:SetName( "Group" )
-        for type, types in pairs( xgui.data.URSRestrictions ) do
+        for type in pairs( xgui.data.URSRestrictions ) do
             urs.typelist:AddLine( type )
         end
     elseif line:GetValue(1) == "Limits" then
         urs.typelist.Columns[1]:SetName( " " )
         urs.itemlist.Columns[1]:SetName( "Group" )
         urs.itemlist.Columns[2]:SetName( "Limit" )
-        for type, types in pairs( xgui.data.URSLimits ) do
+        for type in pairs( xgui.data.URSLimits ) do
             urs.typelist:AddLine( type )
         end
     end
 end
 
-urs.typelist.OnRowSelected = function( panel, lineid, line )
+urs.typelist.OnRowSelected = function( _, _, line )
     urs.addbutton:SetDisabled( false )
     urs.arg1:SetDisabled( false )
     urs.arg2:SetDisabled( false )
@@ -100,7 +100,7 @@ urs.typelist.OnRowSelected = function( panel, lineid, line )
     end
 end
 
-urs.itemlist.OnRowSelected = function( self, lineid, line )
+urs.itemlist.OnRowSelected = function( _, _, line )
     urs.removebutton:SetDisabled( false )
     urs.addbutton:SetDisabled( false )
     urs.arg1:SetDisabled( false )
@@ -114,18 +114,18 @@ end
 
 urs.removebutton.DoClick = function()
     if urs.restrictionlist:GetSelected()[1]:GetValue(1) == "Restrictions" then
-        for item, items in pairs( urs.itemlist:GetSelected() ) do
+        for _, items in pairs( urs.itemlist:GetSelected() ) do
             if not urs.removers[items:GetValue(1)] then urs.removers[items:GetValue(1)] = { } end
             table.insert( urs.removers[items:GetValue(1)], items:GetValue(2) )
         end
-        for target, targets in pairs( urs.removers ) do
-            LocalPlayer():ConCommand( "ulx unrestrict \"".. urs.typelist:GetSelected()[1]:GetValue(1) .."\" \"".. target .."\" ".. table.concat( urs.removers[target], " " ) )
+        for target, _ in pairs( urs.removers ) do
+            LocalPlayer():ConCommand( "ulx unrestrict \"" .. urs.typelist:GetSelected()[1]:GetValue(1) .. "\" \"" .. target .. "\" " .. table.concat( urs.removers[target], " " ) )
         end
     elseif urs.restrictionlist:GetSelected()[1]:GetValue(1) == "Limits" then
-        for item, items in pairs( urs.itemlist:GetSelected() ) do
+        for item in pairs( urs.itemlist:GetSelected() ) do
             table.insert( urs.removers, urs.itemlist:GetSelected()[item]:GetValue(2) )
         end
-        for group, groups in pairs( urs.removers ) do
+        for group in pairs( urs.removers ) do
             RunConsoleCommand( "ulx", "setlimit", urs.typelist:GetSelected()[1]:GetValue(1), urs.itemlist:GetSelected()[group]:GetValue(1), "-1" )
         end
     end
@@ -139,7 +139,7 @@ urs.addbutton.DoClick = function()
         if urs.restrictionlist:GetSelected()[1]:GetValue(1) == "Restrictions" then cmd = "restrict" else cmd = "setlimit" end
 
         if urs.arg1:GetValue() and urs.arg2:GetValue() then
-            LocalPlayer():ConCommand( "ulx ".. cmd .." \"".. urs.typelist:GetSelected()[1]:GetValue(1) .."\" \"".. (cmd == "restrict" and urs.arg2:GetValue() or urs.arg1:GetValue()) .."\" ".. (cmd == "restrict" and urs.arg1:GetValue() or urs.arg2:GetValue()) )
+            LocalPlayer():ConCommand( "ulx " .. cmd .. " \"" .. urs.typelist:GetSelected()[1]:GetValue(1) .. "\" \"" .. (cmd == "restrict" and urs.arg2:GetValue() or urs.arg1:GetValue()) .. "\" " .. (cmd == "restrict" and urs.arg1:GetValue() or urs.arg2:GetValue()) )
         else
             LocalPlayer():ChatPrint( "Missing Argument(s) ~ Please fill in all text boxes." )
         end
@@ -149,31 +149,23 @@ urs.addbutton.DoClick = function()
 end
 
 --------------------------------------------------------------------------------------------------------------------------------------------
-function URSRestrictionProcess( t )
+function URSRestrictionProcess()
     urs.itemlist:Clear()
-    if urs.restrictionlist:GetSelectedLine() then
-        if urs.restrictionlist:GetSelected()[1]:GetValue(1) == "Restrictions" then
-            if urs.typelist:GetSelectedLine() then
-                for item, items in pairs( xgui.data.URSRestrictions[ urs.typelist:GetSelected()[1]:GetValue(1) ] ) do
-                    for group in pairs( items ) do
-                        urs.itemlist:AddLine( item, group )
-                    end
-                end
+    if urs.restrictionlist:GetSelectedLine() and urs.restrictionlist:GetSelected()[1]:GetValue(1) == "Restrictions" and urs.typelist:GetSelectedLine() then
+        for item, items in pairs( xgui.data.URSRestrictions[ urs.typelist:GetSelected()[1]:GetValue(1) ] ) do
+            for group in pairs( items ) do
+                urs.itemlist:AddLine( item, group )
             end
         end
     end
 end
 xgui.hookEvent( "URSRestrictions", "process", URSRestrictionProcess )
 
-function URSLimitsProcess( t )
+function URSLimitsProcess()
     urs.itemlist:Clear()
-    if urs.restrictionlist:GetSelectedLine() then
-        if urs.restrictionlist:GetSelected()[1]:GetValue(1) == "Limits" then
-            if urs.typelist:GetSelectedLine() then
-                for group, groups in pairs( xgui.data.URSLimits[ urs.typelist:GetSelected()[1]:GetValue(1) ] ) do
-                    urs.itemlist:AddLine( group, groups )
-                end
-            end
+    if urs.restrictionlist:GetSelectedLine() and urs.restrictionlist:GetSelected()[1]:GetValue(1) == "Limits" and urs.typelist:GetSelectedLine() then
+        for group, groups in pairs( xgui.data.URSLimits[ urs.typelist:GetSelected()[1]:GetValue(1) ] ) do
+            urs.itemlist:AddLine( group, groups )
         end
     end
 end
