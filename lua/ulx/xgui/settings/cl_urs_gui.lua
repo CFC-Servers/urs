@@ -3,7 +3,6 @@ xgui.prepareDataType( "URSLimits" )
 
 urs = {}
 urs.removers = {}
-urs.weapons2 = {"weapon_para","weapon_crowbar","weapon_stunstick","weapon_physcannon","weapon_physgun","weapon_pistol","weapon_357","weapon_smg1","weapon_ar2","weapon_shotgun","weapon_crossbow",  "weapon_frag", "weapon_rpg", "weapon_slam", "weapon_bugbait", "item_ml_grenade", "item_ar2_grenade", "item_ammo_ar2_altfire", "gmod_camera", "gmod_tool"}
 urs.weapons = weapons.GetList()
 urs.arg1save = nil
 
