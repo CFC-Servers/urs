@@ -83,10 +83,11 @@ function URS.CacheCheck(ply, restrictionType, what, result)
     ply.URS_CacheCheck = ply.URS_CacheCheck or {}
 
     local existing = ply.URS_CacheCheck
-    local restrictionTypes = rawget( existing, restrictionType ) 
+    local restrictionTypes = rawget( existing, restrictionType )
 
     if not restrictionTypes then
         rawset( existing, restrictionType, {} )
+        return result
     end
 
     rawset( restrictionTypes, what, result )
@@ -97,7 +98,10 @@ local cacheCheck = URS.CacheCheck
 
 function URS.Check(ply, restrictionType, what)
     local cachedResult = cachedCheck( ply, restrictionType, what )
-    if cachedResult ~= nil then return cachedResult end
+    if cachedResult ~= nil then
+        PrintRestricted( ply, restrictionType, what )
+        return cachedResult
+    end
 
     what = stringLower(what)
     local restrictionTypePlural = restrictionType .. "s"
