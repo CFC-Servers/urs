@@ -17,7 +17,7 @@ function URS.Load()
             URS[ursType] = {}
         end
 
-        for k, v in pairs(types) do
+        for _, v in pairs(types) do
             if not URS[ursType][v] then
                 URS[ursType][v] = {}
             end
@@ -59,9 +59,9 @@ function URS.PrintRestricted(ply, restrictionType, what)
     if restrictionType == "pickup" then return end -- Constant spam
 
     if echoSpawns then
-        logSpawn(ply:Nick() .."<".. ply:SteamID() .."> spawned/used ".. restrictionType .." ".. what .." -=RESTRICTED=-")
+        logSpawn(ply:Nick() .. "<" .. ply:SteamID() .. "> spawned/used " .. restrictionType .. " " .. what .. " -=RESTRICTED=-" )
     end
-    tsayError(ply, "\"".. what .."\" is a restricted ".. restrictionType .." from your rank.")
+    tsayError(ply, "\"" .. what .. "\" is a restricted " .. restrictionType .. " from your rank." )
 end
 local PrintRestricted = URS.PrintRestricted
 
@@ -138,7 +138,7 @@ function URS.Check(ply, restrictionType, what)
     local hasGroup = allTypeRestrictions and rawget( allTypeRestrictions, group )
 
     if hasGroup then
-        tsayError(ply, "Your rank is restricted from all ".. restrictionTypePlural)
+        tsayError(ply, "Your rank is restricted from all " .. restrictionTypePlural)
         return cacheCheck( ply, restrictionType, what, false )
     end
 
@@ -178,10 +178,10 @@ timer.Simple(0.1, function()
     --  Wiremod's Advanced Duplicator
     if AdvDupe then
         AdvDupe.AdminSettings.AddEntCheckHook( "URSDupeCheck",
-        function(ply, Ent, EntTable)
+        function( ply, _, EntTable )
             return Check( ply, "advdupe", EntTable.Class )
         end,
-        function(Hook)
+        function()
             ULib.tsayColor( nil, false, Color( 255, 0, 0 ), "URSDupeCheck has failed.  Please contact Aaron113 @\nhttp://forums.ulyssesmod.net/index.php/topic,5269.0.html" )
         end )
     end
@@ -221,53 +221,49 @@ function URS.CheckRestrictedTool(ply, tr, tool)
     local ent = rawget( tr, "Entity" )
     if not IsValid( ent ) then return end
 
-    logSpawn( ply:Nick().."<".. ply:SteamID() .."> used the tool ".. tool .." on ".. ent:GetModel() )
+    logSpawn( ply:Nick() .. "<" .. ply:SteamID() .. "> used the tool " .. tool .. " on " .. ent:GetModel() )
 end
 hook.Add( "CanTool", "URSCheckRestrictedTool", URS.CheckRestrictedTool, HOOK_LOW )
 
-function URS.CheckRestrictedEffect(ply, mdl)
+function URS.CheckRestrictedEffect( ply, mdl )
     return Check( ply, "effect", mdl )
 end
 hook.Add( "PlayerSpawnEffect", "URSCheckRestrictedEffect", URS.CheckRestrictedEffect, HOOK_LOW )
 
-function URS.CheckRestrictedNPC(ply, npc, weapon)
+function URS.CheckRestrictedNPC( ply, npc )
     return Check( ply, "npc", npc )
 end
 hook.Add( "PlayerSpawnNPC", "URSCheckRestrictedNPC", URS.CheckRestrictedNPC, HOOK_LOW )
 
-function URS.CheckRestrictedRagdoll(ply, mdl)
+function URS.CheckRestrictedRagdoll( ply, mdl )
     return Check( ply, "ragdoll", mdl )
 end
 hook.Add( "PlayerSpawnRagdoll", "URSCheckRestrictedRagdoll", URS.CheckRestrictedRagdoll, HOOK_LOW )
 
-function URS.CheckRestrictedSWEP(ply, class, weapon)
+function URS.CheckRestrictedSWEP (ply, class )
     if Check( ply, "swep", class ) == false then
         return false
     end
 
     if not echoSpawns then return end
 
-    logSpawn( ply:Nick().."<".. ply:SteamID() .."> spawned/gave himself swep ".. class )
+    logSpawn( ply:Nick() .. "<" .. ply:SteamID() .. "> spawned/gave himself swep " .. class )
 end
 hook.Add( "PlayerSpawnSWEP", "URSCheckRestrictedSWEP", URS.CheckRestrictedSWEP, HOOK_LOW )
 hook.Add( "PlayerGiveSWEP", "URSCheckRestrictedSWEP2", URS.CheckRestrictedSWEP, HOOK_LOW )
 
-function URS.CheckRestrictedPickUp(ply, weapon)
-    if weaponPickups == 2 then
-        if Check( ply, "pickup", weapon:GetClass(), true ) == false then
-            return false
-        end
+function URS.CheckRestrictedPickUp( ply, weapon )
+    if weaponPickups == 2 and not Check( ply, "pickup", weapon:GetClass(), true ) then
+        return false
     end
 
-    if weaponPickups == 1 then
-        if Check( ply, "swep", weapon:GetClass() ) == false then
-            return false
-        end
+    if weaponPickups == 1 and not Check( ply, "swep", weapon:GetClass() ) then
+        return false
     end
 end
 hook.Add( "PlayerCanPickupWeapon", "URSCheckRestrictedPickUp", URS.CheckRestrictedPickUp, HOOK_LOW )
 
-function URS.CheckRestrictedVehicle(ply, mdl, name, vehicle_table)
+function URS.CheckRestrictedVehicle(ply, mdl, name )
     return Check( ply, "vehicle", mdl ) and Check( ply, "vehicle", name )
 end
 hook.Add( "PlayerSpawnVehicle", "URSCheckRestrictedVehicle", URS.CheckRestrictedVehicle, HOOK_LOW )
