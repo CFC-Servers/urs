@@ -195,14 +195,16 @@ timer.Simple( 0.1, function()
     end
 end)
 
-local function CheckRestrictedSENT(ply, sent)
+function URS.CheckRestrictedSENT(ply, sent)
     return Check( ply, "sent", sent )
 end
+local CheckRestrictedSENT = URS.CheckRestrictedSENT
 hook.Add( "PlayerSpawnSENT", "URSCheckRestrictedSENT", CheckRestrictedSENT, HOOK_LOW )
 
-local function CheckRestrictedProp(ply, mdl)
+function URS.CheckRestrictedProp(ply, mdl)
     return Check( ply, "prop", mdl )
 end
+local CheckRestrictedProp = URS.CheckRestrictedProp
 hook.Add( "PlayerSpawnProp", "URSCheckRestrictedProp", CheckRestrictedProp, HOOK_LOW )
 
 local ignoredTools = {
@@ -210,7 +212,7 @@ local ignoredTools = {
     paint = true
 }
 
-local function CheckRestrictedTool(ply, tr, tool)
+function URS.CheckRestrictedTool(ply, tr, tool)
     if Check( ply, "tool", tool ) == false then return false end
 
     if not echoSpawns then return end
@@ -221,24 +223,28 @@ local function CheckRestrictedTool(ply, tr, tool)
 
     logSpawn( ply:Nick() .. "<" .. ply:SteamID() .. "> used the tool " .. tool .. " on " .. ent:GetModel() )
 end
+local CheckRestrictedTool = URS.CheckRestrictedTool
 hook.Add( "CanTool", "URSCheckRestrictedTool", CheckRestrictedTool, HOOK_LOW )
 
-local function CheckRestrictedEffect( ply, mdl )
+function URS.CheckRestrictedEffect( ply, mdl )
     return Check( ply, "effect", mdl )
 end
+local CheckRestrictedEffect = URS.CheckRestrictedEffect
 hook.Add( "PlayerSpawnEffect", "URSCheckRestrictedEffect", CheckRestrictedEffect, HOOK_LOW )
 
-local function CheckRestrictedNPC( ply, npc )
+function URS.CheckRestrictedNPC( ply, npc )
     return Check( ply, "npc", npc )
 end
+local CheckRestrictedNPC = URS.CheckRestrictedNPC
 hook.Add( "PlayerSpawnNPC", "URSCheckRestrictedNPC", CheckRestrictedNPC, HOOK_LOW )
 
-local function CheckRestrictedRagdoll( ply, mdl )
+function URS.CheckRestrictedRagdoll( ply, mdl )
     return Check( ply, "ragdoll", mdl )
 end
+local CheckRestrictedRagdoll = URS.CheckRestrictedRagdoll
 hook.Add( "PlayerSpawnRagdoll", "URSCheckRestrictedRagdoll", CheckRestrictedRagdoll, HOOK_LOW )
 
-local function CheckRestrictedSWEP( ply, class )
+function URS.CheckRestrictedSWEP( ply, class )
     if Check( ply, "swep", class ) == false then
         return false
     end
@@ -247,10 +253,11 @@ local function CheckRestrictedSWEP( ply, class )
 
     logSpawn( ply:Nick() .. "<" .. ply:SteamID() .. "> spawned/gave himself swep " .. class )
 end
+local CheckRestrictedSWEP = URS.CheckRestrictedSWEP
 hook.Add( "PlayerSpawnSWEP", "URSCheckRestrictedSWEP", CheckRestrictedSWEP, HOOK_LOW )
 hook.Add( "PlayerGiveSWEP", "URSCheckRestrictedSWEP2", CheckRestrictedSWEP, HOOK_LOW )
 
-local function CheckRestrictedPickUp( ply, weapon )
+function URS.CheckRestrictedPickUp( ply, weapon )
     if weaponPickups == 2 and Check( ply, "pickup", weapon:GetClass(), true ) == false then
         return false
     end
@@ -259,9 +266,11 @@ local function CheckRestrictedPickUp( ply, weapon )
         return false
     end
 end
+local CheckRestrictedPickUp = URS.CheckRestrictedPickUp
 hook.Add( "PlayerCanPickupWeapon", "URSCheckRestrictedPickUp", CheckRestrictedPickUp, HOOK_LOW )
 
-local function CheckRestrictedVehicle( ply, mdl, name )
+function URS.CheckRestrictedVehicle( ply, mdl, name )
     return Check( ply, "vehicle", mdl ) and Check( ply, "vehicle", name )
 end
+local CheckRestrictedVehicle = URS.CheckRestrictedVehicle
 hook.Add( "PlayerSpawnVehicle", "URSCheckRestrictedVehicle", CheckRestrictedVehicle, HOOK_LOW )
