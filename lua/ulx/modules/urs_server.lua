@@ -238,7 +238,7 @@ local function CheckRestrictedRagdoll( ply, mdl )
 end
 hook.Add( "PlayerSpawnRagdoll", "URSCheckRestrictedRagdoll", CheckRestrictedRagdoll, HOOK_LOW )
 
-local function CheckRestrictedSWEP (ply, class )
+local function CheckRestrictedSWEP( ply, class )
     if Check( ply, "swep", class ) == false then
         return false
     end
@@ -251,11 +251,11 @@ hook.Add( "PlayerSpawnSWEP", "URSCheckRestrictedSWEP", CheckRestrictedSWEP, HOOK
 hook.Add( "PlayerGiveSWEP", "URSCheckRestrictedSWEP2", CheckRestrictedSWEP, HOOK_LOW )
 
 local function CheckRestrictedPickUp( ply, weapon )
-    if weaponPickups == 2 and not Check( ply, "pickup", weapon:GetClass(), true ) then
+    if weaponPickups == 2 and Check( ply, "pickup", weapon:GetClass(), true ) == false then
         return false
     end
 
-    if weaponPickups == 1 and not Check( ply, "swep", weapon:GetClass() ) then
+    if weaponPickups == 1 and Check( ply, "swep", weapon:GetClass() ) == false then
         return false
     end
 end
