@@ -67,8 +67,6 @@ local PrintRestricted = URS.PrintRestricted
 
 -- Return cached value for this check
 function URS.CachedCheck(ply, restrictionType, what)
-    ply.URS_CacheCheck = ply.URS_CacheCheck or {}
-
     local existing = ply.URS_CacheCheck
     local restrictionTypes = rawget( existing, restrictionType )
 
@@ -81,8 +79,6 @@ local cachedCheck = URS.CachedCheck
 
 -- Caches the given check and returns the given result
 function URS.CacheCheck(ply, restrictionType, what, result)
-    ply.URS_CacheCheck = ply.URS_CacheCheck or {}
-
     local existing = ply.URS_CacheCheck
     local restrictionTypes = rawget( existing, restrictionType )
 
@@ -274,3 +270,8 @@ function URS.CheckRestrictedVehicle( ply, mdl, name )
 end
 local CheckRestrictedVehicle = URS.CheckRestrictedVehicle
 hook.Add( "PlayerSpawnVehicle", "URSCheckRestrictedVehicle", CheckRestrictedVehicle, HOOK_LOW )
+
+hook.Add( "PlayerInitialSpawn", "URSSetCheckCache", function( ply )
+    ply.URS_CacheCheck = {}
+end )
+
