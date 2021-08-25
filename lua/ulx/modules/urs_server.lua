@@ -34,7 +34,7 @@ function URS.Save(n)
     if (n == URS_SAVE_ALL or n == URS_SAVE_LIMITS) 			and URS.limits then file.Write("ulx/limits.txt", util.TableToJSON(URS.limits)) end
 
     for _, ply in ipairs( player.GetAll() ) do
-        ply.URS_CacheCheck = nil
+        ply.URS_CacheCheck = {}
     end
 end
 
