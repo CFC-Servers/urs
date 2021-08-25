@@ -96,7 +96,9 @@ local cacheCheck = URS.CacheCheck
 function URS.Check(ply, restrictionType, what)
     local cachedResult = cachedCheck( ply, restrictionType, what )
     if cachedResult ~= nil then
-        PrintRestricted( ply, restrictionType, what )
+        if cachedResult == false then
+            PrintRestricted( ply, restrictionType, what )
+        end
         return cachedResult
     end
 
