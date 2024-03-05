@@ -190,7 +190,8 @@ timer.Simple( 0.1, function()
                 return false
             end
 
-            if EntTable.Model and Check(ply, "advdupe", EntTable.Model) == false then
+            local model = EntTable.Model
+            if model and Check(ply, "advdupe", model) == false then
                 return false
             end
         end)
