@@ -186,7 +186,11 @@ timer.Simple( 0.1, function()
     -- Advanced Duplicator 2 (http://facepunch.com/showthread.php?t=1136597)
     if AdvDupe2 then
         hook.Add("PlayerSpawnEntity", "URSCheckRestrictedEntity", function(ply, EntTable)
-            if Check(ply, "advdupe", EntTable.Class) == false or Check(ply, "advdupe", EntTable.Model) == false then
+            if Check(ply, "advdupe", EntTable.Class) == false then
+                return false
+            end
+
+            if EntTable.Model and Check(ply, "advdupe", EntTable.Model) == false then
                 return false
             end
         end)
