@@ -94,6 +94,9 @@ end
 local cacheCheck = URS.CacheCheck
 
 function URS.Check(ply, restrictionType, what)
+    if not what then return end
+    what = stringLower(what)
+
     local cachedResult = cachedCheck( ply, restrictionType, what )
     if cachedResult ~= nil then
         if cachedResult == false then
@@ -102,7 +105,6 @@ function URS.Check(ply, restrictionType, what)
         return cachedResult
     end
 
-    what = stringLower(what)
     local restrictionTypePlural = restrictionType .. "s"
     local group = ply:GetUserGroup()
 
