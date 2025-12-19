@@ -212,6 +212,15 @@ end
 local CheckRestrictedProp = URS.CheckRestrictedProp
 hook.Add( "PlayerSpawnProp", "URSCheckRestrictedProp", CheckRestrictedProp, HOOK_LOW )
 
+hook.Add("PlayerCheckLimit", "URSCheckPropLimits", function(ply, name, cur, max)
+    if name == "props" and ply:IsAdmin() then
+        local allowed = Check( ply, "prop", "PlayerCheckLimit" )
+        if allowed == false then
+            return false
+        end
+    end
+end)
+
 local ignoredTools = {
     inflator = true,
     paint = true
