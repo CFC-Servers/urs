@@ -213,7 +213,7 @@ local CheckRestrictedProp = URS.CheckRestrictedProp
 hook.Add( "PlayerSpawnProp", "URSCheckRestrictedProp", CheckRestrictedProp, HOOK_LOW )
 
 hook.Add("PlayerCheckLimit", "URSCheckPropLimits", function(ply, name, cur, max)
-    if name == "props" and ply:IsAdmin() then
+    if name == "props" then
         local allowed = Check( ply, "prop", "PlayerCheckLimit" )
         if allowed == false then
             return false
